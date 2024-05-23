@@ -1,0 +1,13 @@
+adb:
+  server:
+    host: 127.0.0.1
+    port: 5037
+  device_serial: 10.1.1.60:6666
+
+uninstall: True
+install: True
+
+timeouts:
+  detect_credit_screen: 300
+  detect_setup_screen: 300
+  gakuen_running: 300
