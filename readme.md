@@ -101,6 +101,6 @@ This project is licensed under the MIT License.
 
 ## Acknowledgements
 
-- [MTM](https://github.com/AldoF/MultiTemplateMatching) for the template matching functionality.
+- [MTM](https://github.com/multi-template-matching/MultiTemplateMatching-Python) for the template matching functionality.
 - [Pillow](https://python-pillow.org/) for image handling.
-- [ADB](https://developer.android.com/studio/command-line/adb) for device communication.
+- [pure-python-adb](https://github.com/Swind/pure-python-adb) for device communication.
