@@ -6,8 +6,11 @@ adb:
 
 uninstall: True
 install: True
+wait_for_download: True
 
 timeouts:
   detect_credit_screen: 300
   detect_setup_screen: 300
   gakuen_running: 300
+  download_start: 300
+  download_finish: 600

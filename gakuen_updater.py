@@ -4,7 +4,6 @@ import cv2
 import time
 import yaml
 import logging
-import coloredlogs
 import numpy as np
 import pandas as pd
 
@@ -80,12 +79,11 @@ class GakuenUpdater():
         
         self.launch_gakuen()
         
-        # wait for the game to start, keep trying to launch the game until it starts for a maximum of 300 seconds
-        if not self.wait_function(self.gakuen_running, 
+        logging.info("Waiting for game to start.")
+        assert self.wait_function(self.gakuen_running,
                                   exec_func=self.launch_gakuen,
-                                    timeout=self.config['timeouts']['gakuen_running'],
-                                    boolean=True):
-            raise Exception("Game did not start in time, exiting.")
+                                  timeout=self.config['timeouts']['gakuen_running'],
+                                  boolean=True) == True, "Game did not start in time, exiting."
 
         logging.info("Waiting for game to finish loading.")
         assert self.wait_function(self.detect_credit_screen, 
@@ -99,25 +97,55 @@ class GakuenUpdater():
         self.click_middle_screen() # click the screen to start
         time.sleep(1)
         
-        # This handles the consent screens and the initial setup screens (agree, agree all)
-        # After that a loading icon is displayed which after a few seconds will disappear
-        # and the game will ask if you want to download additional data. Pressing agree will
-        # start the download. At which moment the screen will rotate and a video will be played.
+        
         
         logging.info("Entering button click loop.")
+        self.button_click_loop()
+        logging.info("Game download started.")
+
+        if not self.config['wait_for_download']:
+            logging.info("flag set to not wait for download, exiting.")
+            self.exit_gakuen()
+            return
+        
+        self.download_loop()
+    
+    def button_click_loop(self):
+        """
+        This method handles the consent screens and the initial setup screens.
+        It waits for the game to start downloading additional data and raises an exception if it takes too long.
+
+        Algorithm:
+        1. Wait for the screen orientation to be 0 (indicating the initial setup screens).
+        2. Detect the screen and click buttons to handle consent screens and initial setup.
+        3. Sleep for 1 second.
+        4. If the game does not start downloading within the specified timeout, raise an exception.
+
+        Raises:
+            Exception: If the game does not start downloading in time.
+
+        """
+        timeout = time.time() + self.config['timeouts']['download_start'] 
         while self.get_screen_orientation() == 0:
             self.detect_screen(1)
             self.click_buttons(True)
             time.sleep(1)
-
-        logging.info("Game has download started.")
-
+            if time.time() > timeout:
+                raise Exception("Game did not start downloading in time, exiting.")
+    
+    def download_loop(self):
+        """
+        Continuously checks if the game has finished downloading.
+        If the game does not finish downloading within the specified timeout,
+        an exception is raised and the program exits.
+        """
         logging.info("Entering download loop.")
-        
-        # While technically not needed, this loop will keep the script running until the game has finished downloading.
+        timeout = time.time() + self.config['timeouts']['download_finish']
         while not self.detect_move_forward():
             self.click_middle_screen()
             time.sleep(1)
+            if time.time() > timeout:
+                raise Exception("Game did not finish downloading in time, exiting.")
         
         logging.info("Game has finished downloading!")
         self.exit_gakuen()
@@ -474,8 +502,9 @@ class GakuenUpdater():
         self.click_template(templateResults)
         
 if __name__ == "__main__":
-    logging.basicConfig(level=logging.DEBUG)
-    coloredlogs.install(level="INFO", fmt="%(asctime)s %(name)s %(levelname)s %(message)s")
+
+    logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    
     logging.info("Starting GakenUpdater.")
     g = GakuenUpdater()
     g.start()
