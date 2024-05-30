@@ -73,11 +73,15 @@ The `config.yaml` file contains the necessary configuration settings:
 - **Installation Settings:**
   - `uninstall`: Set to `True` to uninstall the existing game before installing the new version.
   - `install`: Set to `True` to install the game from the Play Store.
+  - `wait_for_download`: Set to `True` to wait for the game to finish downloading assets.
 
 - **Timeout Settings:**
   - `timeouts.detect_credit_screen`: Timeout for detecting the credit screen (in seconds).
   - `timeouts.detect_setup_screen`: Timeout for detecting the setup screen (in seconds).
   - `timeouts.gakuen_running`: Timeout for checking if the game is running (in seconds).
+  - `timeouts.download_start`: Timeout for waiting for the download of assets to start (in seconds).
+  - `download_finish`: Timeout for waiting for the asset download to finish (in seconds).
+
 
 ## Troubleshooting
 

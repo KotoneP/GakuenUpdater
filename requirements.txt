@@ -2,7 +2,6 @@ opencv-python
 numpy
 pandas
 pyaml
-coloredlogs
 pillow
 pure-python-adb
 Multi-Template-Matching
